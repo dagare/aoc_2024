@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "aoc-2024"
+version = "0.1.0"
+description = "Poetry for AdventOfCode 2024"
+authors = ["Dag-Are Trydal <dagaretrydal@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.1.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
