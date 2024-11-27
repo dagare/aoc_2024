@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Run Day 0",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/solutions/day0/main.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "Run Day 1",
             "type": "python",
             "request": "launch",
