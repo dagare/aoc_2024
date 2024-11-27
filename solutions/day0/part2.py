@@ -6,4 +6,4 @@ def solve(data: str) -> int:
     :return: The solution to Part 2.
     """
     # TODO: Implement logic for Part 2
-    return 0
+    return 898

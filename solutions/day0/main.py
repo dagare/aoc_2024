@@ -3,7 +3,7 @@ import part1
 import part2
 
 def main():
-    input_file = "solutions/day1/input.txt"
+    input_file = "solutions/day0/input.txt"
     data = read_input(input_file)
 
     print("Part 1:", part1.solve(data))
