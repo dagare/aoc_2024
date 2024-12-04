@@ -1,27 +1,177 @@
+import numpy as np
+from scipy.signal import convolve2d
+
+
+def char_to_num(c):
+    if c == 'X':
+        return 1
+    elif c == 'M':
+        return 2
+    elif c == 'A':
+        return 3
+    elif c == 'S':
+        return 4
+    
+    print(f'Value {c} -> 0')
+    return 0
+
+def num_to_char(n):
+    if n == 1:
+        return 'X'
+    elif n == 2:
+        return 'M'
+    elif n == 3:
+        return 'A'
+    elif n == 4:
+        return 'S'
+    
+    return '-'
 
 def parse_file(file_path):
-    lines = ""
+    lines = []
 
     with open(file_path, "r") as file:
         for line in file:
-            lines += line
+            lines.append(line)
     
     return lines
 
-def solve_part1(lines):
+def lines_to_array(lines):
+    data = []
+
+    for line in lines:
+        # print(f'line:{line.strip()}')
+        data.append(list(line.strip()))
+
+
+
+    return data
+
+def char_2_int(char_array):
+    data_as_int = []
+    for row in char_array:
+
+        int_row = []
+        for char in row:
+            int_row.append(char_to_num(char))
+
+        data_as_int.append(int_row)
+
+    return data_as_int
+
+def int_2_char(int_array):
+    data_as_char = []
+    for row in int_array:
+
+        int_row = []
+        for char in row:
+            int_row.append(num_to_char(char))
+
+        data_as_char.append(int_row)
+
+    return data_as_char
+
+
+patterns = {
+    'horizontal': np.array([[1, 2, 3, 4]]),
+    'vertical': np.array([[1], [2], [3], [4]]),
+    'diagonal_down_right': np.diag([1, 2, 3, 4]),
+    'diagonal_down_left': np.flipud(np.diag([1, 2, 3, 4])),
+    'horizontal_reverse': np.array([[4, 3, 2, 1]]),
+    'vertical_reverse': np.array([[4], [3], [2], [1]]),
+    'diagonal_down_right_reverse': np.diag([4, 3, 2, 1]),
+    'diagonal_down_left_reverse': np.flipud(np.diag([4, 3, 2, 1]))
+}
+
+diagonal_kernel = {
+    'horizontal': np.array([[1, 1, 1, 1]]),
+    'vertical': np.array([[1], [1], [1], [1]]),
+    'diagonal_down_right': np.array([1, 1, 1, 1]),
+    'diagonal_down_left': np.flipud(np.diag([1, 1, 1, 1])),
+    'horizontal_reverse': np.array([[1, 1, 1, 1]]),
+    'vertical_reverse': np.array([[1], [1], [1], [1]]),
+    'diagonal_down_right_reverse': np.diag([1, 1, 1, 1]),
+    'diagonal_down_left_reverse': np.flipud(np.diag([1, 1, 1, 1]))
+}
+
+
+def solve_part1(array):
+    array = np.matrix(array)
+    occurrences = 0
+    all_matches = 0
+
+    for direction, pattern in patterns.items():
+        conv_result = convolve2d(array, pattern, mode='valid')
+        pattern_sum = np.sum(pattern**2)
+        
+        matches = np.argwhere(conv_result == pattern_sum)
+        all_matches += len(matches)
+
+        sum = np.sum(conv_result == pattern_sum)
+        occurrences += int(sum)
+
+        highlighted_array = np.full_like(array, 0)
+        for match in matches:
+            r, c = match
+            pr, pc = pattern.shape  # Get pattern dimensions
+
+            # Extract sub-region
+            sub_region = array[r:r+pr, c:c+pc]
+            
+            # Convolve with the pattern
+            convolved_value = np.sum(sub_region * diagonal_kernel[direction])
+            
+            # Update highlighted array (diagonal elements)
+            highlighted_array[r:r+pr, c:c+pc] = convolved_value
+            # highlighted_array[r:r+pr, c:c+pc] = array[r:r+pr, c:c+pc]
+
+        print(f'direction:{direction} pattern:\n{pattern}')
+        print(f'highlighted_array:\n{int_2_char(highlighted_array)}')
+    
+    return occurrences
+
+def solve_part2(array):
     sum = 0
     return sum
 
-def solve_part2(lines):
-    sum = 0
-    return sum
+
+EXAMPLE_INPUT = [
+    'MMMSXXMASM',
+    'MSAMXMSMSA',
+    'AMXSXMAAMM',
+    'MSAMASMSMX',
+    'XMASAMXAMM',
+    'XXAMMXXAMA',
+    'SMSMSASXSS',
+    'SAXAMASAAA',
+    'MAMMMXMMMM',
+    'MXMXAXMASX'
+]
+
+EXAMPLE_INPUT_2 = [
+    'XMASM',
+    'MSAMX',
+    'AMAMM',
+    'SASMA',
+    'SAMMS',
+]
 
 def main():
+    
+
+    array = lines_to_array(EXAMPLE_INPUT_2)
+    int_array = char_2_int(array)
+    char_array = int_2_char(int_array)
+
+    print("\nPart 1 (example):", solve_part1(np.array(int_array)))
+
     input_file = "solutions/day4/input.txt"
     lines = parse_file(input_file)
+    real_array = lines_to_array(lines)
+    real_int_array = char_2_int(real_array)
 
-    print("\nPart 1:", solve_part1(lines))
-    print("\nPart 2:", solve_part2(lines))
+    print("\nPart 1:", solve_part1(real_int_array))
+    print("\nPart 2:", solve_part2(real_int_array))
 
 if __name__ == "__main__":
     main()
