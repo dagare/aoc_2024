@@ -23,8 +23,8 @@ EXAMPLE_INPUT_2 = [
     'XMASM',
     'MSAMX',
     'AMAMM',
-    'SASMA',
-    'SAMMS',
+    'SAAMA',
+    'SSMMS'
 ]
 
 def test_convert_example():
