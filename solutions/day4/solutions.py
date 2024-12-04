@@ -3,13 +3,15 @@ from scipy.signal import convolve2d
 
 def char_to_num(c):
     if c == 'X':
-        return 10
+        return 1
     elif c == 'M':
-        return 20
+        return 2
     elif c == 'A':
-        return 30
+        return 3
     elif c == 'S':
-        return 40
+        return 4
+    elif c == '.':
+        return 0
     
     print(f'Value {c} -> 0')
     return 0
@@ -52,8 +54,8 @@ def lines_to_array(lines):
 #     'diagonal_down_left_reverse': np.flipud(np.diag([4, 3, 2, 1]))
 # }
 
-lr = list([10, 20, 30, 40])
-rl = list([40, 30, 20, 10])
+lr = list([1, 2, 3, 4])
+rl = list([4, 3, 2, 1])
 
 patterns = {
     'horizontal': np.array([lr]),
@@ -79,6 +81,25 @@ diagonal_kernel = {
     'diagonal_down_left_reverse': np.flipud(np.diag(ones))
 }
 
+the_x = [
+    [2, 0, 4],
+    [0, 3, 0],
+    [2, 0, 4]]
+
+
+xmas_kernels = {
+    'deg_0': np.array(the_x),
+    '90deg': np.rot90(the_x),
+    '180deg': np.rot90(the_x, k=2),
+    '270deg': np.rot90(the_x, k=3),
+}
+
+xmas_boolean_kernel = np.array([
+    [1, 0, 1],
+    [0, 1, 0],
+    [1, 0, 1]
+])
+
 def all_is_same(sub_region, pattern, match, direction):
     r, c = match
     pr, pc = pattern.shape  # Get pattern dimensions
@@ -99,7 +120,20 @@ def all_is_same(sub_region, pattern, match, direction):
     # Horizontal or vertical match
     return np.array_equal(sub_region, pattern)
 
-def solve_part1(array):
+def all_is_same_for_x(sub_region, pattern, match, direction):
+    r, c = match
+    pr, pc = pattern.shape  # Get pattern dimensions
+            
+    if sub_region.shape != pattern.shape:
+        return False
+
+    diag_match = np.all(np.diagonal(sub_region) == np.diagonal(pattern))
+    
+    anti_diag_match = np.all(np.diagonal(np.fliplr(sub_region)) == np.diagonal(np.fliplr(pattern)))
+    
+    return diag_match and anti_diag_match
+
+def solve_part1(array, print_debug=False):
     occurrences = 0
     all_matches = 0
 
@@ -131,16 +165,48 @@ def solve_part1(array):
                 # highlighted_array[r:r+pr, c:c+pc] = array[r:r+pr, c:c+pc]
                 occurrences += 1
 
-        print(f'direction:{direction} pattern:\n{pattern}')
-        print(f'highlighted_array:\n{highlighted_array}')
+        if print_debug: print(f'direction:{direction} pattern:\n{pattern}')
+        if print_debug: print(f'highlighted_array:\n{highlighted_array}')
     
-    print(f'occurrences:{occurrences} all_matches:{all_matches}')
+    if print_debug: print(f'occurrences:{occurrences} all_matches:{all_matches}')
 
     return occurrences
 
-def solve_part2(array):
-    sum = 0
-    return sum
+def solve_part2(array, print_debug=False):
+    occurrences = 0
+
+    for direction, pattern in xmas_kernels.items():
+        conv_result = convolve2d(array, pattern, mode='valid')
+        # pattern_sum = np.sum(pattern**2)
+        pattern_sum_2 = convolve2d(pattern, pattern, mode='valid')
+        pattern_sum_2_ = np.sum(convolve2d(pattern, pattern, mode='valid'))
+        matches = np.argwhere(conv_result == pattern_sum_2_)
+
+        sum = np.sum(conv_result == pattern_sum_2_)
+
+        highlighted_array = np.full_like(array, 0)
+        for match in matches:
+            r, c = match
+            pr, pc = pattern.shape  # Get pattern dimensions
+
+            # Extract sub-region
+            sub_region = array[r:r+pr, c:c+pc]
+            
+            if all_is_same_for_x(sub_region, pattern, match, direction):
+                # Convolve with the pattern
+                convolved_value = np.sum(sub_region ** xmas_boolean_kernel)
+                
+                # Update highlighted array (diagonal elements)
+                highlighted_array[r:r+pr, c:c+pc] = convolved_value
+                # highlighted_array[r:r+pr, c:c+pc] = array[r:r+pr, c:c+pc]
+                occurrences += 1
+
+        if print_debug: print(f'direction:{direction} pattern:\n{pattern}')
+        if print_debug: print(f'highlighted_array:\n{highlighted_array}')
+    
+    if print_debug: print(f'occurrences:{occurrences}')
+
+    return occurrences
 
 
 EXAMPLE_INPUT = [
@@ -164,8 +230,22 @@ EXAMPLE_INPUT_2 = [
     'SSMMS'
 ]
 
+EXAMPLE_INPUT_3 = [
+'.M.S......',
+'..A..MSMS.',
+'.M.S.MAA..',
+'..A.ASMSM.',
+'.M.S.M....',
+'..........',
+'S.S.S.S.S.',
+'.A.A.A.A..',
+'M.M.M.M.M.',
+'..........',
+]
+
 def main():
    
+
 
     print("\nPart 1 (example):", solve_part1(lines_to_array(EXAMPLE_INPUT_2)))
     print("\nPart 1 (example one):", solve_part1(lines_to_array(EXAMPLE_INPUT)))
@@ -175,7 +255,10 @@ def main():
     array = lines_to_array(lines)
 
     print("\nPart 1:", solve_part1(array))
-    # print("\nPart 2:", solve_part2(array))
+
+    print("\nPart 2 (example):", solve_part2(lines_to_array(EXAMPLE_INPUT_3)))
+
+    print("\nPart 2:", solve_part2(array))
 
 if __name__ == "__main__":
     main()
