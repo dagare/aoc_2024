@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.signal import convolve2d
 
-
 def char_to_num(c):
     if c == 'X':
         return 1
@@ -14,18 +13,6 @@ def char_to_num(c):
     
     print(f'Value {c} -> 0')
     return 0
-
-def num_to_char(n):
-    if n == 1:
-        return 'X'
-    elif n == 2:
-        return 'M'
-    elif n == 3:
-        return 'A'
-    elif n == 4:
-        return 'S'
-    
-    return '-'
 
 def parse_file(file_path):
     lines = []
@@ -43,13 +30,8 @@ def lines_to_array(lines):
         # print(f'line:{line.strip()}')
         data.append(list(line.strip()))
 
-
-
-    return data
-
-def char_2_int(char_array):
     data_as_int = []
-    for row in char_array:
+    for row in data:
 
         int_row = []
         for char in row:
@@ -57,20 +39,7 @@ def char_2_int(char_array):
 
         data_as_int.append(int_row)
 
-    return data_as_int
-
-def int_2_char(int_array):
-    data_as_char = []
-    for row in int_array:
-
-        int_row = []
-        for char in row:
-            int_row.append(num_to_char(char))
-
-        data_as_char.append(int_row)
-
-    return data_as_char
-
+    return np.array(data_as_int)
 
 patterns = {
     'horizontal': np.array([[1, 2, 3, 4]]),
@@ -96,7 +65,6 @@ diagonal_kernel = {
 
 
 def solve_part1(array):
-    array = np.matrix(array)
     occurrences = 0
     all_matches = 0
 
@@ -126,7 +94,7 @@ def solve_part1(array):
             # highlighted_array[r:r+pr, c:c+pc] = array[r:r+pr, c:c+pc]
 
         print(f'direction:{direction} pattern:\n{pattern}')
-        print(f'highlighted_array:\n{int_2_char(highlighted_array)}')
+        print(f'highlighted_array:\n{highlighted_array}')
     
     return occurrences
 
@@ -157,21 +125,16 @@ EXAMPLE_INPUT_2 = [
 ]
 
 def main():
-    
+   
 
-    array = lines_to_array(EXAMPLE_INPUT_2)
-    int_array = char_2_int(array)
-    char_array = int_2_char(int_array)
-
-    print("\nPart 1 (example):", solve_part1(np.array(int_array)))
+    print("\nPart 1 (example):", solve_part1(lines_to_array(EXAMPLE_INPUT_2)))
 
     input_file = "solutions/day4/input.txt"
     lines = parse_file(input_file)
-    real_array = lines_to_array(lines)
-    real_int_array = char_2_int(real_array)
+    array = lines_to_array(lines)
 
-    print("\nPart 1:", solve_part1(real_int_array))
-    print("\nPart 2:", solve_part2(real_int_array))
+    print("\nPart 1:", solve_part1(array))
+    print("\nPart 2:", solve_part2(array))
 
 if __name__ == "__main__":
     main()
