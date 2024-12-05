@@ -66,6 +66,8 @@ class Update:
     def __init__(self, pages):
         self.pages = [int(s) for s in pages]
 
+        self.original_pages = self.pages
+
     def is_valid(self, rules):
         
         # Skip first requires adding one to index
@@ -84,6 +86,27 @@ class Update:
             # if common_items
 
         return True
+    
+    def try_to_fix(self, rules):
+
+     
+        for page_index in range(len(self.pages)):
+            page = self.pages[page_index]
+            # page_index += 1
+            first_half_pages = self.pages[:page_index]
+
+            pages_that_cannot_come_before = rules.get(page)
+            pages_that_cannot_come_before_set = set(pages_that_cannot_come_before)
+            
+            for (idx, first_half_page) in enumerate(first_half_pages):
+                if first_half_page in pages_that_cannot_come_before_set:
+                    # time to swap
+                    temp = self.pages[idx]
+                    self.pages[idx] = self.pages[page_index]
+                    self.pages[page_index] = temp
+
+        
+        return self.is_valid(rules)
     
     def middle(self):
         if len(self.pages) % 2 == 0:
@@ -124,22 +147,43 @@ def solve_part1(rules, updates):
     return sum
 
 def solve_part2(rules, updates):
+    
 
-    return 0
+    invalid_updates = []
+    for update in updates:
+        if not update.is_valid(rules):
+
+            invalid_updates.append(update)
+
+
+    sum = 0
+
+    for invalid_update in invalid_updates:
+        # while not invalid_update.is_valid(rules):
+        #     is_valid = invalid_update.try_to_fix(rules)
+        #     print(f'Retrying to fix. Valid:{is_valid} {invalid_update.original_pages} -> {invalid_update.pages}')
+        invalid_update.try_to_fix(rules)
+
+        middle_value = invalid_update.middle()
+        sum += middle_value
+
+    return sum
 
 
 def main():
    
 
     (example_rules, example_updates) = parse_lines(EXAMPLE_INPUT)
-    print("\nPart 1 (example):", solve_part1(example_rules, example_updates))
+    p1 = solve_part1(example_rules, example_updates)
+    print(f'Part 1 (example): {p1} Correct: {p1==143}')
+    p2 = solve_part2(example_rules, example_updates)
+    print(f'Part 2 (example): {p2} Correct: {p2==123}')
 
     input_file = "solutions/day5/input.txt"
     lines = parse_file(input_file)
     (rules, updates) = parse_lines(lines)
 
     print("\nPart 1:", solve_part1(rules, updates))
-    # print("\nPart 2 (example):", solve_part2((EXAMPLE_INPUT_3)))
     print("\nPart 2:", solve_part2(rules, updates))
 
 if __name__ == "__main__":
