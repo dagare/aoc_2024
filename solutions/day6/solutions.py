@@ -101,22 +101,34 @@ class Map:
         elif guard.dir == 'v':
             next_position = (guard.pos[0]+1, guard.pos[1])
 
-        # is obstacle -> turn direction (not done)
+        # next is obstacle -> turn direction (not done)
         if self.map[next_position[0]][next_position[1]] == '#':
+            # self.map[guard.pos[0]][guard.pos[1]] = '┼'
+            
+
             if guard.dir == '<':
                 guard.dir = '^'
+                self.map[guard.pos[0]][guard.pos[1]] = '└'
             elif guard.dir == '>':
                 guard.dir = 'v'
+                self.map[guard.pos[0]][guard.pos[1]] = '┐'
             elif guard.dir == '^':
                 guard.dir = '>'
+                self.map[guard.pos[0]][guard.pos[1]] = '┌'
             elif guard.dir == 'v':
                 guard.dir = '<'
+                self.map[guard.pos[0]][guard.pos[1]] = '┘'
 
             return (guard, False)
 
         # Set state to visited
         if self.map[next_position[0]][next_position[1]] == '.': 
-            self.map[next_position[0]][next_position[1]] = 'x'
+            if guard.dir in '<>':
+                self.map[next_position[0]][next_position[1]] = '─'
+            elif guard.dir in '^v':
+                self.map[next_position[0]][next_position[1]] = '│'
+        elif self.map[next_position[0]][next_position[1]] in '─│': 
+            self.map[next_position[0]][next_position[1]] = '┼'
 
         guard.pos = next_position
 
@@ -146,13 +158,13 @@ class Map:
         sum = 0
         for i in range(self.map_size[0]):
             for j in range(self.map_size[1]):
-                if self.map[i][j] == 'x':
+                if self.map[i][j] in 'x<>^v─│┼┌┘┐└':
                     sum += 1
                 # elif self.map[i][j] in '<>^v':
                 #     sum += 1
 
         # just add one for the start position
-        sum +=1 
+        # sum +=1 
 
         return sum
                     
@@ -167,7 +179,7 @@ def solve_part1(map):
 
     return map.summarize_visited_cells()
 
-def solve_part2(lines):
+def solve_part2(lines, filename):
     solved_map = Map(lines)
 
     # Solve one first (to highligh visited areas)
@@ -176,7 +188,13 @@ def solve_part2(lines):
     while not is_done:
         (guard, is_done) = solved_map.move_guard(guard)
 
+    with open(filename, 'w') as f:
+        for line in solved_map.map:
+            f.write(f"{''.join(line)}\n")
+
         
+    return 0
+
     infinite_loop_cnt = 0
     infinite_loop_positions = []
 
@@ -205,25 +223,25 @@ def solve_part2(lines):
 
 
 def main():
-    # simple_map_1 = Map(SIMPLE_INPUT_1)
-    # p11 = solve_part1(simple_map_1)
-    # print(f'Part 1 (simple_1): {p11} Correct: {p11==4}')
-    # simple_map_2 = Map(SIMPLE_INPUT_2)
-    # p12 = solve_part1(simple_map_2)
-    # print(f'Part 1 (simple_2): {p12} Correct: {p12==5}')
+    simple_map_1 = Map(SIMPLE_INPUT_1)
+    p11 = solve_part1(simple_map_1)
+    print(f'Part 1 (simple_1): {p11} Correct: {p11==4}')
+    simple_map_2 = Map(SIMPLE_INPUT_2)
+    p12 = solve_part1(simple_map_2)
+    print(f'Part 1 (simple_2): {p12} Correct: {p12==5}')
 
-    # example_map = Map(EXAMPLE_INPUT)
-    # p1 = solve_part1(example_map)
-    # print(f'Part 1 (example): {p1} Correct: {p1==41}')
+    example_map = Map(EXAMPLE_INPUT)
+    p1 = solve_part1(example_map)
+    print(f'Part 1 (example): {p1} Correct: {p1==41}')
 
 
-    p21 = solve_part2(SIMPLE_INPUT_1)
+    p21 = solve_part2(SIMPLE_INPUT_1, "part2_simple1.txt")
     print(f'Part 2 (simple_1): {p21} Correct: {p21==0}')
-    p22 = solve_part2(SIMPLE_INPUT_1)
+    p22 = solve_part2(SIMPLE_INPUT_2, "part2_simple2.txt")
     print(f'Part 2 (simple_2): {p22} Correct: {p22==0}')
 
 
-    p2 = solve_part2(EXAMPLE_INPUT)
+    p2 = solve_part2(EXAMPLE_INPUT, "part2_example.txt")
     print(f'Part 2 (example): {p2} Correct: {p2==6}')
 
     input_file = "solutions/day6/input.txt"
@@ -231,7 +249,7 @@ def main():
     map = Map(lines)
 
     print("\nPart 1:", solve_part1(map))
-    print("\nPart 2:", solve_part2(lines))
+    print("\nPart 2:", solve_part2(lines, "part2_real.txt"))
 
 if __name__ == "__main__":
     main()
