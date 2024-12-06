@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 import copy
 
 SIMPLE_INPUT_1 = [
@@ -87,7 +88,7 @@ class Map:
         return None
         
     def move_guard(self, guard): 
-        self.previous_guard_states.append(guard)
+        self.previous_guard_states.append(copy.deepcopy(guard))
 
         next_position = None
 
@@ -167,42 +168,53 @@ def solve_part1(map):
     return map.summarize_visited_cells()
 
 def solve_part2(lines):
-    map = Map(lines)
+    solved_map = Map(lines)
+
+    # Solve one first (to highligh visited areas)
+    guard = solved_map.find_guard()
+    (guard, is_done) = (guard, False)
+    while not is_done:
+        (guard, is_done) = solved_map.move_guard(guard)
 
         
     infinite_loop_cnt = 0
     infinite_loop_positions = []
 
-    for i in range(map.map_size[0]):
-        for j in range(map.map_size[1]):
-            if map.map[i][j] == '.':
-                temp_map = Map(lines)
-                temp_map.map[i][j] = 'x'
-                guard = temp_map.find_guard()
-            
-                (guard, is_done) = (guard, False)
-                while not is_done:
-                    (guard, is_done) = temp_map.move_guard(guard)
-                    
-                    if temp_map.is_in_infinite_loop(guard):
-                        infinite_loop_positions.append((i, j))
-                        infinite_loop_cnt += 1
-                        break
+    total_iterations = solved_map.map_size[0] * solved_map.map_size[1]
+    with tqdm(total=total_iterations, desc="Progress") as pbar:
+        for i in range(solved_map.map_size[0]):
+            for j in range(solved_map.map_size[1]):
+                # no need to test in areas the guard never visits
+                if solved_map.map[i][j] == 'x':
+                    temp_map = Map(lines)
+                    temp_map.map[i][j] = '#'
+                    guard = temp_map.find_guard()
+                
+                    (guard, is_done) = (guard, False)
+                    while not is_done:
+                        (guard, is_done) = temp_map.move_guard(guard)
+                        
+                        if temp_map.is_in_infinite_loop(guard):
+                            infinite_loop_positions.append((i, j))
+                            infinite_loop_cnt += 1
+                            break
+                
+                pbar.update(1)
 
     return infinite_loop_cnt
 
 
 def main():
-    simple_map_1 = Map(SIMPLE_INPUT_1)
-    p11 = solve_part1(simple_map_1)
-    print(f'Part 1 (simple_1): {p11} Correct: {p11==4}')
-    simple_map_2 = Map(SIMPLE_INPUT_2)
-    p12 = solve_part1(simple_map_2)
-    print(f'Part 1 (simple_2): {p12} Correct: {p12==5}')
+    # simple_map_1 = Map(SIMPLE_INPUT_1)
+    # p11 = solve_part1(simple_map_1)
+    # print(f'Part 1 (simple_1): {p11} Correct: {p11==4}')
+    # simple_map_2 = Map(SIMPLE_INPUT_2)
+    # p12 = solve_part1(simple_map_2)
+    # print(f'Part 1 (simple_2): {p12} Correct: {p12==5}')
 
-    example_map = Map(EXAMPLE_INPUT)
-    p1 = solve_part1(example_map)
-    print(f'Part 1 (example): {p1} Correct: {p1==41}')
+    # example_map = Map(EXAMPLE_INPUT)
+    # p1 = solve_part1(example_map)
+    # print(f'Part 1 (example): {p1} Correct: {p1==41}')
 
 
     p21 = solve_part2(SIMPLE_INPUT_1)
