@@ -1,6 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 import copy
+import os
 
 SIMPLE_INPUT_1 = [
 '.#..',
@@ -73,15 +74,16 @@ class Map:
 
         # self.array = np.array(self.map, dtype='<U1')
 
-        self.map_size = (len(self.map), len(self.map[0]))
+        self.m = len(self.map)
+        self.n = len(self.map[0])
 
         self.previous_guard_states = []
 
 
     def find_guard(self):
 
-        for i in range(self.map_size[0]):
-            for j in range(self.map_size[1]):
+        for i in range(self.m):
+            for j in range(self.n):
                 if self.map[i][j] in '<>^v':
                     return Guard(i, j, self.map[i][j])
 
@@ -92,6 +94,7 @@ class Map:
 
         next_position = None
 
+        # Find out where next position should be
         if guard.dir == '<':
             next_position = (guard.pos[0], guard.pos[1]-1)
         elif guard.dir == '>':
@@ -156,8 +159,8 @@ class Map:
 
     def summarize_visited_cells(self):
         sum = 0
-        for i in range(self.map_size[0]):
-            for j in range(self.map_size[1]):
+        for i in range(self.m):
+            for j in range(self.n):
                 if self.map[i][j] in 'x<>^v─│┼┌┘┐└':
                     sum += 1
                 # elif self.map[i][j] in '<>^v':
@@ -167,6 +170,15 @@ class Map:
         # sum +=1 
 
         return sum
+    
+    def get_visited_cells_wo_start(self):
+        visited_cells=[]
+        for i in range(self.m):
+            for j in range(self.n):
+                if self.map[i][j] in 'x─│┼┌┘┐└':
+                    visited_cells.append((i, j))
+
+        return visited_cells
                 
     def save_to_file(self, path):
         with open(path, 'w') as f:
@@ -196,14 +208,15 @@ def solve_part2(lines, filename):
     #     for line in solved_map.map:
     #         f.write(f"{''.join(line)}\n")
 
+    cells_to_try = solved_map.get_visited_cells_wo_start()
 
     infinite_loop_cnt = 0
     infinite_loop_positions = []
 
-    total_iterations = solved_map.map_size[0] * solved_map.map_size[1]
+    total_iterations = len(cells_to_try)
     with tqdm(total=total_iterations, desc="Progress") as pbar:
-        for i in range(solved_map.map_size[0]):
-            for j in range(solved_map.map_size[1]):
+        for i in range(solved_map.m):
+            for j in range(solved_map.n):
                 # no need to test in areas the guard never visits
                 if solved_map.map[i][j] in 'x─│┼┌┘┐└':
                     temp_map = Map(lines)
@@ -218,7 +231,7 @@ def solve_part2(lines, filename):
                         if temp_map.is_in_infinite_loop(guard):
                             infinite_loop_positions.append((i, j))
                             infinite_loop_cnt += 1
-                            temp_map.save_to_file(filename+f'_i:{i}_j:{j}')
+                            temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/"+filename+f'_{i*j}_(i:{i}_j:{j}).log'))
                             break
 
                 pbar.update(1)
@@ -239,13 +252,13 @@ def main():
     print(f'Part 1 (example): {p1} Correct: {p1==41}')
 
 
-    p21 = solve_part2(SIMPLE_INPUT_1, "part2_simple1.txt")
+    p21 = solve_part2(SIMPLE_INPUT_1, "part2_simple1")
     print(f'Part 2 (simple_1): {p21} Correct: {p21==0}')
-    p22 = solve_part2(SIMPLE_INPUT_2, "part2_simple2.txt")
+    p22 = solve_part2(SIMPLE_INPUT_2, "part2_simple2")
     print(f'Part 2 (simple_2): {p22} Correct: {p22==0}')
 
 
-    p2 = solve_part2(EXAMPLE_INPUT, "part2_example.txt")
+    p2 = solve_part2(EXAMPLE_INPUT, "part2_example")
     print(f'Part 2 (example): {p2} Correct: {p2==6}')
 
     input_file = "solutions/day6/input.txt"
@@ -253,7 +266,7 @@ def main():
     map = Map(lines)
 
     print("\nPart 1:", solve_part1(map))
-    # print("\nPart 2:", solve_part2(lines, "part2_real.txt"))
+    print("\nPart 2:", solve_part2(lines, "part2_real"))
 
 if __name__ == "__main__":
     main()
