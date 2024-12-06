@@ -102,7 +102,7 @@ class Map:
             next_position = (guard.pos[0]+1, guard.pos[1])
 
         # next is obstacle -> turn direction (not done)
-        if self.map[next_position[0]][next_position[1]] == '#':
+        if self.map[next_position[0]][next_position[1]] in '#@':
             # self.map[guard.pos[0]][guard.pos[1]] = '┼'
             
 
@@ -167,8 +167,11 @@ class Map:
         # sum +=1 
 
         return sum
-                    
-
+                
+    def save_to_file(self, path):
+        with open(path, 'w') as f:
+            for line in self.map:
+                f.write(f"{''.join(line)}\n")
 
 def solve_part1(map):
     guard = map.find_guard()
@@ -188,12 +191,11 @@ def solve_part2(lines, filename):
     while not is_done:
         (guard, is_done) = solved_map.move_guard(guard)
 
-    with open(filename, 'w') as f:
-        for line in solved_map.map:
-            f.write(f"{''.join(line)}\n")
+    solved_map.save_to_file(filename)
+    # with open(filename, 'w') as f:
+    #     for line in solved_map.map:
+    #         f.write(f"{''.join(line)}\n")
 
-        
-    return 0
 
     infinite_loop_cnt = 0
     infinite_loop_positions = []
@@ -203,20 +205,22 @@ def solve_part2(lines, filename):
         for i in range(solved_map.map_size[0]):
             for j in range(solved_map.map_size[1]):
                 # no need to test in areas the guard never visits
-                if solved_map.map[i][j] == 'x':
+                if solved_map.map[i][j] in 'x─│┼┌┘┐└':
                     temp_map = Map(lines)
-                    temp_map.map[i][j] = '#'
+                    temp_map.map[i][j] = '@'
                     guard = temp_map.find_guard()
                 
-                    (guard, is_done) = (guard, False)
+                    # (guard, is_done) = (guard, False)
+                    is_done = False
                     while not is_done:
                         (guard, is_done) = temp_map.move_guard(guard)
                         
                         if temp_map.is_in_infinite_loop(guard):
                             infinite_loop_positions.append((i, j))
                             infinite_loop_cnt += 1
+                            temp_map.save_to_file(filename+f'_i:{i}_j:{j}')
                             break
-                
+
                 pbar.update(1)
 
     return infinite_loop_cnt
@@ -249,7 +253,7 @@ def main():
     map = Map(lines)
 
     print("\nPart 1:", solve_part1(map))
-    print("\nPart 2:", solve_part2(lines, "part2_real.txt"))
+    # print("\nPart 2:", solve_part2(lines, "part2_real.txt"))
 
 if __name__ == "__main__":
     main()
