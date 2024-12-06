@@ -2,6 +2,7 @@ import numpy as np
 from tqdm import tqdm
 import copy
 import os
+from multiprocessing import Process
 
 SIMPLE_INPUT_1 = [
 '.#..',
@@ -203,7 +204,7 @@ def solve_part2(lines, filename):
     while not is_done:
         (guard, is_done) = solved_map.move_guard(guard)
 
-    solved_map.save_to_file(filename)
+    solved_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/solved_"+filename+".log"))
     # with open(filename, 'w') as f:
     #     for line in solved_map.map:
     #         f.write(f"{''.join(line)}\n")
@@ -215,26 +216,23 @@ def solve_part2(lines, filename):
 
     total_iterations = len(cells_to_try)
     with tqdm(total=total_iterations, desc="Progress") as pbar:
-        for i in range(solved_map.m):
-            for j in range(solved_map.n):
-                # no need to test in areas the guard never visits
-                if solved_map.map[i][j] in 'x─│┼┌┘┐└':
-                    temp_map = Map(lines)
-                    temp_map.map[i][j] = '@'
-                    guard = temp_map.find_guard()
+        for (i, j) in cells_to_try:
+            temp_map = Map(lines)
+            temp_map.map[i][j] = '@'
+            guard = temp_map.find_guard()
+        
+            # (guard, is_done) = (guard, False)
+            is_done = False
+            while not is_done:
+                (guard, is_done) = temp_map.move_guard(guard)
                 
-                    # (guard, is_done) = (guard, False)
-                    is_done = False
-                    while not is_done:
-                        (guard, is_done) = temp_map.move_guard(guard)
-                        
-                        if temp_map.is_in_infinite_loop(guard):
-                            infinite_loop_positions.append((i, j))
-                            infinite_loop_cnt += 1
-                            temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/"+filename+f'_{i*j}_(i:{i}_j:{j}).log'))
-                            break
+                if temp_map.is_in_infinite_loop(guard):
+                    infinite_loop_positions.append((i, j))
+                    infinite_loop_cnt += 1
+                    temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/"+filename+f'_(i,j):({i},{j})_{i*j}.log'))
+                    break
 
-                pbar.update(1)
+            pbar.update(1)
 
     return infinite_loop_cnt
 
