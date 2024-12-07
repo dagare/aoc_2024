@@ -271,8 +271,10 @@ def main():
     lines = parse_file(input_file)
     map = Map(lines)
 
-    print("\nPart 1:", solve_part1(map))
-    print("\nPart 2:", solve_part2(lines, "part2_real"))
+    p1 = solve_part1(map)
+    print(f'\nPart 1: {p1} Correct:{p1==4967}')
+    p2 = solve_part2(lines, "part2_real")
+    print(f'\nPart 2: {p2} Correct:{p2==1789}')
 
 if __name__ == "__main__":
     main()
