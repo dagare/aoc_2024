@@ -48,6 +48,8 @@ class Calibration:
             left_value += numbers[0]
         elif operator == '*':
             left_value = left_value * numbers[0]
+        elif operator == '|':
+            left_value = int(str(left_value) + str(numbers[0]))
 
         # Early return for invalid path
         if left_value > self.target_sum:
@@ -78,26 +80,26 @@ def parse_lines(lines):
     
     return calibrations
 
-def solve_part1(calibrations):
+def solve_part1(calibrations, print_debug=False):
 
     sum = 0
 
     for calibration in calibrations:
         solution_sequence = calibration.is_solvable(['+', '*'])
         if solution_sequence:
-            print(f'CORRECT. {calibration.target_sum}: {calibration.values}, {solution_sequence}')
+            if print_debug: print(f'CORRECT. {calibration.target_sum}: {calibration.values}, {solution_sequence}')
             sum += calibration.target_sum
 
     return sum
 
-def solve_part2(calibrations):
+def solve_part2(calibrations, print_debug=False):
 
     sum = 0
 
     for calibration in calibrations:
-        solution_sequence = calibration.is_solvable(['+', '*','||'])
+        solution_sequence = calibration.is_solvable(['+', '*','|'])
         if solution_sequence:
-            print(f'CORRECT. {calibration.target_sum}: {calibration.values}, {solution_sequence}')
+            if print_debug: print(f'CORRECT. {calibration.target_sum}: {calibration.values}, {solution_sequence}')
             sum += calibration.target_sum
 
     return sum
@@ -106,9 +108,9 @@ def main():
    
 
     calibrations = parse_lines(EXAMPLE_INPUT)
-    p1 = solve_part1(calibrations)
+    p1 = solve_part1(calibrations, True)
     print(f'Part 1 (example): {p1} Correct: {p1==3749}')
-    p2 = solve_part2(calibrations)
+    p2 = solve_part2(calibrations, True)
     print(f'Part 2 (example): {p2} Correct: {p2==11387}')
 
     input_file = "solutions/day7/input.txt"
@@ -116,7 +118,7 @@ def main():
     calibrations = parse_lines(lines)
 
     print("\nPart 1:", solve_part1(calibrations))
-    # print("\nPart 2:", solve_part2(calibrations))
+    print("\nPart 2:", solve_part2(calibrations))
 
 if __name__ == "__main__":
     main()
