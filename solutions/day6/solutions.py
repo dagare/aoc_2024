@@ -2,7 +2,7 @@ import numpy as np
 from tqdm import tqdm
 import copy
 import os
-from multiprocessing import Process
+import time
 
 SIMPLE_INPUT_1 = [
 '.#..',
@@ -214,8 +214,11 @@ def solve_part2(lines, filename):
     infinite_loop_cnt = 0
     infinite_loop_positions = []
 
+    start_time = time.time()
+
     total_iterations = len(cells_to_try)
     for (i, j) in cells_to_try:
+        current_iter_start_time = time.time()
         temp_map = Map(lines)
         temp_map.map[i][j] = '@'
         guard = temp_map.find_guard()
@@ -235,7 +238,9 @@ def solve_part2(lines, filename):
                 is_infinite_loop = True
                 break
 
-        print(f'(i,j):({i},{j}) \tinfinite_loop:{is_infinite_loop} \tinfinite_loop_cnt:{infinite_loop_cnt}')
+        iter_time = time.time() - current_iter_start_time
+        total_time = time.time() - start_time
+        print(f'(i,j):({i},{j}) \tinfinite_loop:{is_infinite_loop} \tinfinite_loop_cnt:{infinite_loop_cnt} \titer_time:{iter_time:.1f} \ttotal_time:{total_time:.1f}')
 
     return infinite_loop_cnt
 
