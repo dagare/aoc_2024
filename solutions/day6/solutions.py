@@ -215,24 +215,27 @@ def solve_part2(lines, filename):
     infinite_loop_positions = []
 
     total_iterations = len(cells_to_try)
-    with tqdm(total=total_iterations, desc="Progress") as pbar:
-        for (i, j) in cells_to_try:
-            temp_map = Map(lines)
-            temp_map.map[i][j] = '@'
-            guard = temp_map.find_guard()
-        
-            # (guard, is_done) = (guard, False)
-            is_done = False
-            while not is_done:
-                (guard, is_done) = temp_map.move_guard(guard)
-                
-                if temp_map.is_in_infinite_loop(guard):
-                    infinite_loop_positions.append((i, j))
-                    infinite_loop_cnt += 1
-                    temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/"+filename+f'_(i,j):({i},{j})_{i*j}.log'))
-                    break
+    for (i, j) in cells_to_try:
+        temp_map = Map(lines)
+        temp_map.map[i][j] = '@'
+        guard = temp_map.find_guard()
+    
+        # (guard, is_done) = (guard, False)
+        is_done = False
+        is_infinite_loop = False
+        while not is_done:
+            (guard, is_done) = temp_map.move_guard(guard)
+            
+            if temp_map.is_in_infinite_loop(guard):
+                infinite_loop_positions.append((i, j))
+                infinite_loop_cnt += 1
+                temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/"+filename+f'_(i,j):({i},{j})_{i*j}.log'))
+                with open(os.path.join(os.path.dirname(__file__), "infinite_loops/"+filename+f'_infinite_loop_indexes.log'), 'a') as f:
+                    f.write(f"{i},{j}\n")
+                is_infinite_loop = True
+                break
 
-            pbar.update(1)
+        print(f'(i,j):({i},{j}) \tinfinite_loop:{is_infinite_loop} \tinfinite_loop_cnt:{infinite_loop_cnt}')
 
     return infinite_loop_cnt
 
