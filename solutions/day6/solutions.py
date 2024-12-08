@@ -3,6 +3,7 @@ from tqdm import tqdm
 import copy
 import os
 import time
+from pathlib import Path
 
 SIMPLE_INPUT_1 = [
 '.#..',
@@ -206,6 +207,8 @@ def solve_part1(map):
     return map.summarize_visited_cells()
 
 def solve_part2(lines, filename):
+    Path(os.path.join(os.path.dirname(__file__), "debug/v1/infinite_loops")).mkdir(parents=True, exist_ok=True)
+
     solved_map = Map(lines)
 
     # Solve one first (to highligh visited areas)
@@ -214,7 +217,7 @@ def solve_part2(lines, filename):
     while not is_done:
         (guard, is_done) = solved_map.move_guard(guard)
 
-    solved_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/solved_"+filename+".log"))
+    solved_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/v1/solved_"+filename+".log"))
     # with open(filename, 'w') as f:
     #     for line in solved_map.map:
     #         f.write(f"{''.join(line)}\n")
@@ -242,8 +245,8 @@ def solve_part2(lines, filename):
             if temp_map.is_in_infinite_loop(guard):
                 infinite_loop_positions.append((i, j))
                 infinite_loop_cnt += 1
-                temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/"+filename+f'_(i,j):({i},{j})_{i*j}.log'))
-                with open(os.path.join(os.path.dirname(__file__), "infinite_loops/"+filename+f'_infinite_loop_indexes.log'), 'a') as f:
+                temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/v1/"+filename+f'_(i,j):({i},{j})_{i*j}.log'))
+                with open(os.path.join(os.path.dirname(__file__), "debug/v1/infinite_loops/"+filename+f'_infinite_loop_indexes.log'), 'a') as f:
                     f.write(f"{i},{j}\n")
                 is_infinite_loop = True
                 break
@@ -529,13 +532,16 @@ class Map_v2:
         return f'Size:{self.map.shape}\n{self.map}'
 
 def solve_part2_v2(lines, filename):
+
+    Path(os.path.join(os.path.dirname(__file__), "debug/v2/infinite_loops")).mkdir(parents=True, exist_ok=True)
+
     solved_map = Map_v2(lines)
 
     (is_done, is_in_infinite_loop) = (False, False)
     while not is_done and not is_in_infinite_loop:
         (is_done, is_in_infinite_loop) = solved_map.move_guard()
 
-    solved_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug_v2/solved_"+filename+".log"))
+    solved_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/v2/solved_"+filename+".log"))
     # with open(filename, 'w') as f:
     #     for line in solved_map.map:
     #         f.write(f"{''.join(line)}\n")
@@ -560,8 +566,8 @@ def solve_part2_v2(lines, filename):
             if is_in_infinite_loop:
                 infinite_loop_positions.append((i, j))
                 infinite_loop_cnt += 1
-                temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug_v2/"+filename+f'_(i,j):({i},{j})_{i*j}.log'))
-                with open(os.path.join(os.path.dirname(__file__), "infinite_loops_v2/"+filename+f'_infinite_loop_indexes.log'), 'a') as f:
+                temp_map.save_to_file(os.path.join(os.path.dirname(__file__), "debug/v2/"+filename+f'_(i,j):({i},{j})_{i*j}.log'))
+                with open(os.path.join(os.path.dirname(__file__), "debug/v2/infinite_loops/"+filename+f'_infinite_loop_indexes.log'), 'a') as f:
                     f.write(f"{i},{j}\n")
                 break
 

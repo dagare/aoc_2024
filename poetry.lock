@@ -112,6 +112,17 @@ files = [
 ]
 
 [[package]]
+name = "pathlib"
+version = "1.0.1"
+description = "Object-oriented filesystem paths"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pathlib-1.0.1-py3-none-any.whl", hash = "sha256:f35f95ab8b0f59e6d354090350b44a80a80635d22efdedfa84c7ad1cf0a74147"},
+    {file = "pathlib-1.0.1.tar.gz", hash = "sha256:6940718dfc3eff4258203ad5021090933e5c04707d5ca8cc9e73c94a7894ea9f"},
+]
+
+[[package]]
 name = "pluggy"
 version = "1.5.0"
 description = "plugin and hook calling mechanisms for python"
@@ -233,4 +244,4 @@ telegram = ["requests"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f2f8f40902d09df29d5074d3e47855b08a3421e3a9186b312058d0aeacbe1888"
+content-hash = "f1cfa73d95c159eb876e578bd0038dbf3e8e025069210b023d755fa7b5d6a81a"
