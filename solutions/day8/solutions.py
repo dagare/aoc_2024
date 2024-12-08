@@ -21,7 +21,7 @@ EXAMPLE_INPUT = [
 '............',
 '............',
 '........A...',
-'.........A..',
+'..f......A..',
 '............',
 '............'
 ]
@@ -32,7 +32,7 @@ def parse_file(file_path):
 
     with open(file_path, "r") as file:
         for line in file:
-            lines.append(line)
+            lines.append(line.strip())
     
     return lines
 
@@ -100,7 +100,7 @@ class Map:
 
 
     def __repr__(self):
-        return f'{self.map}'
+        return f'Size:{self.map.shape}\n{self.map}'
 
 
 
@@ -130,10 +130,13 @@ def main():
 
     input_file = "solutions/day8/input.txt"
     lines = parse_file(input_file)
-    map = Map(lines)
+    map = Map(lines) 
 
-    print("\nPart 1:", solve_part1(map))
-    print("\nPart 2:", solve_part2(map))
+    p1 = solve_part1(map)
+    print(f'\nPart 1: {p1}. Correct: {p1==390}')
+
+    p2 = solve_part2(map)
+    print(f'\nPart 2: {p2}. Correct: {p2==390}')
 
 if __name__ == "__main__":
     main()
