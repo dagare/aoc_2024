@@ -26,6 +26,19 @@ EXAMPLE_INPUT = [
 '............'
 ]
 
+EXAMPLE_INPUT_P2 = [
+    'T.........',
+    '...T......',
+    '.T........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+]
+
 def parse_file(file_path):
 
     lines = []
@@ -72,20 +85,30 @@ class Map:
     
         self.rows, self.cols = self.map.shape
 
-    def find_reflections(self):
+    def find_reflections(self, include_resonant_harmonics=False):
 
         for frequency, locations in self.frequency_locations.items():
             
             for a, b in itertools.combinations(locations, 2):
+                if include_resonant_harmonics:
+                    self.map[a[0],a[1]].set_reflection()
+                    self.map[b[0],b[1]].set_reflection()
+
                 d = (a[0] - b[0], a[1] - b[1])
                 (i, j) = (a[0] + d[0], a[1] + d[1])
-                if self.is_index_in_matrix(i,j):
+                while self.is_index_in_matrix(i,j):
                     self.map[i,j].set_reflection()
+                    (i, j) = (i + d[0], j + d[1])
+                    if not include_resonant_harmonics:
+                        break
 
                 d = (b[0] - a[0], b[1] - a[1])
                 (i, j) = (b[0] + d[0], b[1] + d[1])
-                if self.is_index_in_matrix(i,j):
+                while self.is_index_in_matrix(i,j):
                     self.map[i,j].set_reflection()
+                    (i, j) = (i + d[0], j + d[1])
+                    if not include_resonant_harmonics:
+                        break
 
     def is_index_in_matrix(self, i, j):
         return 0 <= i < self.rows and 0 <= j < self.cols
@@ -111,22 +134,29 @@ def solve_part1(map, debug=False):
     return map.sum_antinodes()
 
 def solve_part2(map, debug=False):
-    sum = 0
-    return sum
+    
+    map.find_reflections(include_resonant_harmonics=True)
+
+    return map.sum_antinodes()
 
 def main():
     map = Map(SIMPLE_INPUT)
-    print(f'Before:\n{map}')
+    # print(f'Before:\n{map}')
     p1 = solve_part1(map, True)
-    print(f'After:\n{map}')
+    # print(f'After:\n{map}')
+    print(f'Part 1 (simple example): {p1} Correct: {p1==8}')
 
     map = Map(EXAMPLE_INPUT)
-    print(f'Before:\n{map}')
+    # print(f'Before:\n{map}')
     p1 = solve_part1(map, True)
-    print(f'After:\n{map}')
+    # print(f'After:\n{map}')
     print(f'Part 1 (example): {p1} Correct: {p1==14}')
+
+    map = Map(EXAMPLE_INPUT_P2)
+    print(f'Before:\n{map}')
     p2 = solve_part2(map, True)
-    print(f'Part 2 (example): {p2} Correct: {p2==11387}')
+    print(f'After:\n{map}')
+    print(f'Part 2 (example): {p2} Correct: {p2==9}')
 
     input_file = "solutions/day8/input.txt"
     lines = parse_file(input_file)
@@ -136,7 +166,7 @@ def main():
     print(f'\nPart 1: {p1}. Correct: {p1==390}')
 
     p2 = solve_part2(map)
-    print(f'\nPart 2: {p2}. Correct: {p2==390}')
+    print(f'\nPart 2: {p2}. Correct: {p2==1246}')
 
 if __name__ == "__main__":
     main()
