@@ -76,6 +76,14 @@
             "program": "${workspaceFolder}/solutions/day7/solutions.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Run Day 8",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/solutions/day8/solutions.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ],
     //  Use VS Code's Python Path Awareness
