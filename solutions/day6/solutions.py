@@ -459,7 +459,7 @@ class Map_v2:
                 next_position = (self.guard.pos[0], self.guard.pos[1]-1)
 
 
-        ok = self.map[self.guard.pos[0], self.guard.pos[1]].set_to_visited(entry_exit)
+        ok = self.map[next_position[0], next_position[1]].set_to_visited(entry_exit)
 
         in_a_infinate_loop = False
         if not ok:
