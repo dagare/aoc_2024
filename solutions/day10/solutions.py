@@ -62,12 +62,16 @@ class Map:
         sum = 0
 
         for trail_head in self.trail_heads:
-            hilltops = self.solve_position(trail_head, find_distinct)
+            hilltops = self.solve_position(trail_head)
+            
+            if not find_distinct:
+                hilltops = list(set(hilltops))
+            
             sum += len(hilltops)
 
         return sum
     
-    def solve_position(self, position, find_distinct=False):
+    def solve_position(self, position):
         current_height_value = self.map[position[0],position[1]]
 
         next_positions = []
@@ -79,16 +83,17 @@ class Map:
         results = []
 
         for (i, next_position) in enumerate(next_positions):
-            if self.is_outside_bounds(next_position) or (current_height_value+1) != self.map[next_position[0], next_position[1]]:
+            if self.is_outside_bounds(next_position):
                 continue
+            
+            if (current_height_value+1) != self.map[next_position[0], next_position[1]]:
+                continue
+            
+            if self.map[next_position[0], next_position[1]] == 9:
+                results.append((next_position[0], next_position[1]))
             else:
-                if self.map[next_position[0], next_position[1]] == 9:
-                    results.append(f'{next_position[0]}, {next_position[1]}')
-                else:
-                    results.extend(self.solve_position(next_position, find_distinct))
-                    if not find_distinct: results = list(set(results))
-                    
-
+                results.extend(self.solve_position(next_position))
+            
         return results
 
     def is_at_end(self):
