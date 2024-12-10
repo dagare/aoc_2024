@@ -89,7 +89,7 @@
             "name": "Run Day 10",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/solutions/day10/main.py",
+            "program": "${workspaceFolder}/solutions/day10/solutions.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }

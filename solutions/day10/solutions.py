@@ -57,17 +57,17 @@ class Map:
         self.rows, self.cols = self.map.shape
                     
         
-    def solve_trail_heads(self):
+    def solve_trail_heads(self, find_distinct=False):
 
         sum = 0
 
         for trail_head in self.trail_heads:
-            hilltops = self.solve_position(trail_head)
+            hilltops = self.solve_position(trail_head, find_distinct)
             sum += len(hilltops)
 
         return sum
     
-    def solve_position(self, position):
+    def solve_position(self, position, find_distinct=False):
         current_height_value = self.map[position[0],position[1]]
 
         next_positions = []
@@ -85,8 +85,8 @@ class Map:
                 if self.map[next_position[0], next_position[1]] == 9:
                     results.append(f'{next_position[0]}, {next_position[1]}')
                 else:
-                    results.extend(self.solve_position(next_position))
-                    results = list(set(results))
+                    results.extend(self.solve_position(next_position, find_distinct))
+                    if not find_distinct: results = list(set(results))
                     
 
         return results
@@ -127,6 +127,11 @@ def solve_part1(lines, debug=False):
 
     return map.solve_trail_heads()
 
+def solve_part2(lines, debug=False):
+    map = Map(lines)
+
+    return map.solve_trail_heads(find_distinct=True)
+
 def main():
     p1 = solve_part1(SIMPLE_INPUT, True)
     print(f'Part 1 (simple example): {p1} Correct: {p1==1}')
@@ -142,6 +147,9 @@ def main():
 
     p1 = solve_part1(lines)
     print(f'\nPart 1: {p1}. Correct: {p1==733}')
+
+    p2 = solve_part2(lines)
+    print(f'\nPart 2: {p2}. Correct: {p2==1514}')
 
 if __name__ == "__main__":
     main()
